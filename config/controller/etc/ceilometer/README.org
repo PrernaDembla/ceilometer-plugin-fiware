@@ -11,7 +11,6 @@
 #+SELECT_TAGS: export
 #+EXCLUDE_TAGS: noexport
 #+CREATOR: Emacs 25.1.1 (Org mode 9.0.5)
-* Introduction
   The following document aims at summarizes the metrics exported by Ceilometer and Monasca agent in a FIWARE region, specifying how each field is calculated and which is the pollster providing it. This documents is based on the exported fields taken from [[file:monasca_field_definitions.yaml][monasca_field_definitions.yaml]] and form the [[https://github.com/telefonicaid/fiware-monitoring-parsers/blob/develop/monasca_persister/README.rst][Monasca Persister data points parser]].
 
   20170424: In the future a similar summary should be done for the values exported by the [[https://github.com/SmartInfrastructures/FIWARELab-monitoringAPI][monitoringAPI]] in order to have a clear mapping between the metrics collected in the region and the related computed/aggregated metrics provided by the monitoringAPI.
