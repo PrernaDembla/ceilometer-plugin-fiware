@@ -21,21 +21,21 @@
 	Total physical memory (in MB) available in the host. Value of =ram_allocation_ratio= not considered.
 
    - compute.node.ram.now ::
-	Sum of the memory (in MB) allocated to the instances that run on the host plus the memory allocated to the host itself.
+	Sum of the memory (in MB) allocated to instances that run on the host plus the memory allocated to the host itself.
 	Could be more than =compute.node.ram.tot= if =ram_allocation_ratio= is > 1.
 
    - compute.node.ram.max ::
-	Sum of the memory (in MB) allocated to the instances that run on the host.
+	Sum of the memory (in MB) allocated to instances that run on the host.
 	Could be more than =compute.node.ram.tot= if =ram_allocation_ratio= is > 1.
 
    - compute.node.cpu.tot ::
 	Total number of physical CPUs available in the host. Value of =cpu_allocation_ratio= not considered.
 
    - compute.node.cpu.now ::
-	Sum of the virtual CPUs allocated instances running on the host plus the virtual CPUs allocated to the host itself.
+	Sum of the virtual CPUs allocated to instances running on the host plus the virtual CPUs allocated to the host itself.
 	Could be more than =compute.node.cpu.tot= if =cpu_allocation_ration= is > 1.
    - compute.node.cpu.max ::
-	Sum of the virtual CPUs allocated instances running on the host.
+	Sum of the virtual CPUs allocated to instances running on the host.
 	Could be more than =compute.node.cpu.tot= if =cpu_allocation_ration= is > 1.
 
    - compute.node.disk.tot ::
@@ -43,16 +43,49 @@
        Usually the volume is =/dev/mapper/vm-nova= and mounted on =/va/lib/nova/=.
 
    - compute.node.disk.now ::
-	Sum of the root and ephemeral disk sizes (in GB) of the instances that run on the host plus the disk size allocated to the host itself.
+	Sum of the root and ephemeral disk sizes (in GB) allocated to instances that run on the host plus the disk size allocated to the host itself.
 
    - compute.node.disk.max ::
-	Sum of the root and ephemeral disk sizes (in GB) of the instances that run on the host.
+	Sum of the root and ephemeral disk sizes (in GB) allocated to instances that run on the host.
 
    /Standard Ceilometer metrics (https://docs.openstack.org/admin-guide/telemetry-measurements.html#openstack-compute)/
 
    - compute.node.cpu.percent ::
 	Compute host CPU utilization in percentage
 
+   /Note:/ _Allocated_ resources means resources booked from instances of a specific tenant. If instances are in =shutdown= state, resources are still allocated.
+
   Resources:
   - https://docs.openstack.org/admin-guide/common/nova-show-usage-statistics-for-hosts-instances.html
   - https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux_OpenStack_Platform/4/html/End_User_Guide/usage_statistics.html
+* Entity type = 'vm'
+  /Standard Ceilometer measurements starting from Kilo/
+  - instance :: Existence of instance. Used by FIWARE monitoring to store in metadata and dimensions the following additional instance information:
+
+    /in metadata/
+    - name: name if the instance
+    - host: resource_id of the host where the instance runs
+    - status: status of the instance
+    - instance_type: Instance flavor ID
+    - image_ref: Instance base image ID
+    - properties: catalogue_ge_id
+
+    /in dimensions/
+    - user_id: user ID of instance owner
+    - project_id: tenant/project ID of instance owner
+
+  - vcpus ::
+	Number of virtual CPUs allocated to the instance.
+  - cpu_util ::
+	Average CPU utilization of the instance in percentage
+  - memory ::
+	Volume of RAM (in MB) allocated to the instance.
+  - memory.usage ::
+	Volume of RAM (in MB) used by the instance from the amount of its allocated memory.
+  - memory_util ::
+	Instance RAM real utilization in percentage.
+	Calculated from a Ceilometer transformer in compute host [[file:~/work/repositories/ficore/ceilometer-plugin-fiware/config/compute/etc/ceilometer/pipeline.yaml][pipeline.yaml]] with =100 * memory.usage / memory=.
+  - disk.capacity :: The amount of disk (in B) that the instance can see. Consider the device disk tot space.*
+  - disk.usage :: The physical size (in B) of the image container on the host. Consider only the real space used by COW.*
+
+  *: This does not consider any other block device attached to the instance but only the instance root disk.
