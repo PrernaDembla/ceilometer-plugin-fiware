@@ -19,14 +19,16 @@
 
 from __future__ import absolute_import
 
-from oslo.config import cfg
-from oslo.utils import timeutils
-from ceilometer.openstack.common import log
+from oslo_config import cfg
+from oslo_utils import timeutils
+from oslo_log import log
 from ceilometer.agent import plugin_base
 from ceilometer import sample
 from neutronclient.v2_0 import client as clientN
 from netaddr import *
 from ceilometer.region import OSVersionComponent
+from keystoneauth1 import identity
+from keystoneauth1 import session
 
 LOG = log.getLogger(__name__)
 
@@ -60,13 +62,21 @@ class _Base(plugin_base.PollsterBase):
 
 class RegionPollster(_Base):
     def get_samples(self, manager, cache, resources):
-        neutron = clientN.Client(
-            username=cfg.CONF.service_credentials.os_username,
-            password=cfg.CONF.service_credentials.os_password,
-            tenant_name=cfg.CONF.service_credentials.os_tenant_name,
-            auth_url=cfg.CONF.service_credentials.os_auth_url,
-            region_name=cfg.CONF.service_credentials.os_region_name
-        )
+        username=cfg.CONF.service_credentials.username
+        password=cfg.CONF.service_credentials.password
+        project_name=cfg.CONF.service_credentials.project_name
+        auth_url=cfg.CONF.service_credentials.auth_url
+        region_name=cfg.CONF.service_credentials.region_name
+        project_domain_id=cfg.CONF.service_credentials.project_domain_id
+        user_domain_id=cfg.CONF.service_credentials.user_domain_id
+        auth = identity.Password(auth_url=auth_url,
+                         username=username,
+                         password=password,
+                         project_name=project_name,
+                         project_domain_id=project_domain_id,
+                         user_domain_id=user_domain_id)
+        sess = session.Session(auth=auth)
+        neutron = clientN.Client(session=sess)
 
         # initialize some variables:
         pool_size = 0
@@ -121,7 +131,7 @@ class RegionPollster(_Base):
 
         # create region Object
         # build metadata
-        metaD["name"] = (cfg.CONF.service_credentials.os_region_name if cfg.CONF.service_credentials.os_region_name else None)
+        metaD["name"] = (cfg.CONF.service_credentials.region_name if cfg.CONF.service_credentials.region_name else None)
         metaD["latitude"] = (cfg.CONF.region.latitude if cfg.CONF.region.latitude else 0.0)
         metaD["longitude"] = (cfg.CONF.region.longitude if cfg.CONF.region.longitude else 0.0)
         metaD["location"] = (cfg.CONF.region.location if cfg.CONF.region.location else None)
@@ -155,7 +165,7 @@ class RegionPollster(_Base):
                 volume=regionInfo['value'],
                 user_id=None,
                 project_id=None,
-                resource_id=cfg.CONF.service_credentials.os_region_name,
+                resource_id=cfg.CONF.service_credentials.region_name,
                 timestamp=timeutils.isotime(),
                 resource_metadata=metaD
             )
