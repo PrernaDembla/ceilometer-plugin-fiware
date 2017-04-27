@@ -316,7 +316,12 @@ REQ_VERSION_AGENT=1.1.21-FIWARE
 REQ_VERSION_CEILOSCA=2015.1.2
 REQ_VERSION_CEILOMETER=2015.1.1
 REQ_VERSION_POLLSTER_HOST=1.0.1
-REQ_VERSION_POLLSTER_REGION=1.0.3
+REQ_VERSION_POLLSTER_REGION=1.2.0
+# Pollsters version mapping
+# Kilo		--> 1.0.x
+# Liberty	--> 1.1.x
+# Mitaka	--> 1.2.x
+# Newton	--> 1.3.x
 
 # Timestamps
 NOW=$(date +%s)
