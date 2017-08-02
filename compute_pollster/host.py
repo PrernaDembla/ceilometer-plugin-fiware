@@ -3,7 +3,7 @@
 #
 # Author: Attilio Broglio <abroglio AT create-net DOT org>
 #
-# Version: 1.0.1
+# Version: 1.2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -17,12 +17,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer.openstack.common import log
+from oslo_log import log
 from ceilometer.compute import pollsters
 from ceilometer.i18n import _, _LW
 from ceilometer import sample
-from oslo.utils import timeutils
-from oslo.config import cfg
+from oslo_utils import timeutils
+from oslo_config import cfg
 from novaclient import client
 
 LOG = log.getLogger(__name__)
