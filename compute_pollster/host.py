@@ -38,19 +38,19 @@ class HostPollster(pollsters.BaseComputePollster):
 
     @staticmethod
     def get_samples(manager, cache, resources):
-        username=cfg.CONF.service_credentials.username
-        password=cfg.CONF.service_credentials.password
-        project_name=cfg.CONF.service_credentials.project_name
-        auth_url=cfg.CONF.service_credentials.auth_url
-        region_name=cfg.CONF.service_credentials.region_name
-        project_domain_id=cfg.CONF.service_credentials.project_domain_id
-        user_domain_id=cfg.CONF.service_credentials.user_domain_id
+        username = cfg.CONF.service_credentials.username
+        password = cfg.CONF.service_credentials.password
+        project_name = cfg.CONF.service_credentials.project_name
+        auth_url = cfg.CONF.service_credentials.auth_url
+        # region_name = cfg.CONF.service_credentials.region_name
+        project_domain_id = cfg.CONF.service_credentials.project_domain_id
+        user_domain_id = cfg.CONF.service_credentials.user_domain_id
         auth = identity.Password(auth_url=auth_url,
-                         username=username,
-                         password=password,
-                         project_name=project_name,
-                         project_domain_id=project_domain_id,
-                         user_domain_id=user_domain_id)
+                                 username=username,
+                                 password=password,
+                                 project_name=project_name,
+                                 project_domain_id=project_domain_id,
+                                 user_domain_id=user_domain_id)
         sess = session.Session(auth=auth)
         nt = client.Client(session=sess)
 
@@ -62,17 +62,26 @@ class HostPollster(pollsters.BaseComputePollster):
             values = []
             if len(info) >= 3:
                 # total
-                values.append({'name': 'ram.tot', 'unit': 'MB', 'value': (info[0].memory_mb if info[0].memory_mb else 0)})
-                values.append({'name': 'disk.tot', 'unit': 'GB', 'value': (info[0].disk_gb if info[0].disk_gb else 0)})
-                values.append({'name': 'cpu.tot', 'unit': 'cpu', 'value': (info[0].cpu if info[0].cpu else 0)})
+                values.append({'name': 'ram.tot', 'unit': 'MB', 'value': (
+                    info[0].memory_mb if info[0].memory_mb else 0)})
+                values.append({'name': 'disk.tot', 'unit': 'GB', 'value': (
+                    info[0].disk_gb if info[0].disk_gb else 0)})
+                values.append({'name': 'cpu.tot', 'unit': 'cpu',
+                               'value': (info[0].cpu if info[0].cpu else 0)})
                 # now
-                values.append({'name': 'ram.now', 'unit': 'MB', 'value': (info[1].memory_mb if info[1].memory_mb else 0)})
-                values.append({'name': 'disk.now', 'unit': 'GB', 'value': (info[1].disk_gb if info[1].disk_gb else 0)})
-                values.append({'name': 'cpu.now', 'unit': 'cpu', 'value': (info[1].cpu if info[1].cpu else 0)})
+                values.append({'name': 'ram.now', 'unit': 'MB', 'value': (
+                    info[1].memory_mb if info[1].memory_mb else 0)})
+                values.append({'name': 'disk.now', 'unit': 'GB', 'value': (
+                    info[1].disk_gb if info[1].disk_gb else 0)})
+                values.append({'name': 'cpu.now', 'unit': 'cpu',
+                               'value': (info[1].cpu if info[1].cpu else 0)})
                 # max
-                values.append({'name': 'ram.max', 'unit': 'MB', 'value': (info[2].memory_mb if info[2].memory_mb else 0)})
-                values.append({'name': 'disk.max', 'unit': 'GB', 'value': (info[2].disk_gb if info[2].disk_gb else 0)})
-                values.append({'name': 'cpu.max', 'unit': 'cpu', 'value': (info[2].cpu if info[2].cpu else 0)})
+                values.append({'name': 'ram.max', 'unit': 'MB', 'value': (
+                    info[2].memory_mb if info[2].memory_mb else 0)})
+                values.append({'name': 'disk.max', 'unit': 'GB', 'value': (
+                    info[2].disk_gb if info[2].disk_gb else 0)})
+                values.append({'name': 'cpu.max', 'unit': 'cpu',
+                               'value': (info[2].cpu if info[2].cpu else 0)})
 
             for item in values:
                 yield sample.Sample(
@@ -88,4 +97,5 @@ class HostPollster(pollsters.BaseComputePollster):
                 )
 
         except Exception as err:
-            LOG.exception(_('could not get info for host %(host)s: %(e)s'), {'host': host, 'e': err})
+            LOG.exception(_('could not get info for host %(host)s: %(e)s'), {
+                          'host': host, 'e': err})
