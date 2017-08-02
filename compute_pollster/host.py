@@ -1,7 +1,6 @@
 #
 # Copyright 2015 CREATE-NET <abroglio AT create-net DOT org>
 #
-# Author: Attilio Broglio <abroglio AT create-net DOT org>
 #
 # Version: 1.2.0
 #
@@ -19,7 +18,7 @@
 
 from oslo_log import log
 from ceilometer.compute import pollsters
-from ceilometer.i18n import _, _LW
+from ceilometer.i18n import _
 from ceilometer import sample
 from oslo_utils import timeutils
 from oslo_config import cfg
