@@ -24,6 +24,8 @@ from ceilometer import sample
 from oslo_utils import timeutils
 from oslo_config import cfg
 from novaclient import client
+from keystoneauth1 import identity
+from keystoneauth1 import session
 
 LOG = log.getLogger(__name__)
 
@@ -36,13 +38,21 @@ class HostPollster(pollsters.BaseComputePollster):
 
     @staticmethod
     def get_samples(manager, cache, resources):
-        nt = client.Client(
-            version=2,
-            username=cfg.CONF.service_credentials.os_username,
-            api_key=cfg.CONF.service_credentials.os_password,
-            project_id=cfg.CONF.service_credentials.os_tenant_name,
-            auth_url=cfg.CONF.service_credentials.os_auth_url,
-            region_name=cfg.CONF.service_credentials.os_region_name)
+        username=cfg.CONF.service_credentials.username
+        password=cfg.CONF.service_credentials.password
+        project_name=cfg.CONF.service_credentials.project_name
+        auth_url=cfg.CONF.service_credentials.auth_url
+        region_name=cfg.CONF.service_credentials.region_name
+        project_domain_id=cfg.CONF.service_credentials.project_domain_id
+        user_domain_id=cfg.CONF.service_credentials.user_domain_id
+        auth = identity.Password(auth_url=auth_url,
+                         username=username,
+                         password=password,
+                         project_name=project_name,
+                         project_domain_id=project_domain_id,
+                         user_domain_id=user_domain_id)
+        sess = session.Session(auth=auth)
+        nt = client.Client(session=sess)
 
         host = cfg.CONF.host
         nodename = cfg.CONF.host
