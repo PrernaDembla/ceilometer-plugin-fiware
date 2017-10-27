@@ -46,6 +46,8 @@ The installation and configuration procedure involves both *Central agent pollst
 *Compute agent pollsters* at every compute node. This repository contains all the pollsters and files that IOs would
 need to customize the default Ceilometer installation.
 
+For OpenStack version Liberty some customisations are necessary, [here](./Liberty-customizations.md) is a document detailing the steps.
+
 ### Controller(s)
 
 #### Pollster for region
