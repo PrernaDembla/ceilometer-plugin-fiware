@@ -127,6 +127,11 @@ in entry points:
 
    ```
    compute_monitors = ComputeDriverCPUMonitor
+   # The below line is suggested for > Kilo but the above will work, too:
+   # - https://greencircle.vmturbo.com/docs/DOC-4125-enabling-cpu-metrics-in-openstack
+   # - https://docs.openstack.org/newton/config-reference/compute/config-options.html
+   # - https://docs.openstack.org/mitaka/config-reference/compute/config-options.html
+   # compute_monitors = nova.compute.monitors.cpu.virt_driver
    notification_driver = messagingv2
    ```
 
