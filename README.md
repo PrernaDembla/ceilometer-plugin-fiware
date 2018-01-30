@@ -473,7 +473,7 @@ http://docs.openstack.org/developer/ceilometer/architecture.html
 "Ceilometer System Architecture"
 
 [ceilometer_architecture_pict]:
-http://docs.openstack.org/developer/ceilometer/_images/ceilo-arch.png
+https://docs.openstack.org/ceilometer/mitaka/_images/ceilo-arch.png
 "Ceilometer System Architecture"
 
 [telemetry]:
