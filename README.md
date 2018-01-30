@@ -105,19 +105,6 @@ Please follow these steps:
    # service ceilometer-agent-central restart
    ```
 
-#### Pollster for image
-
-__NOT NEEDED IF YOU HAVE A CEILOMETER FOR OPENSTACK KILO__
-
-The pollster for the images is already provided by a standard installation of Ceilometer. Please check if it is included
-in entry points:
-
-1. Open the entry points file and look for this entry at the `[ceilometer.notification]` section:
-
-   ```
-   image = ceilometer.image.notifications:Image
-   ```
-
 
 ### Compute nodes
 
@@ -158,35 +145,6 @@ in entry points:
    ```
    # service nova-compute restart
    # service ceilometer-agent-compute restart
-   ```
-
-#### Pollster for vm
-
-__NOT NEEDED IF YOU HAVE A CEILOMETER FOR OPENSTACK KILO__
-
-1. Replace file `$PYTHON_SITE_PKG/ceilometer/compute/virt/inspector.py` with that at location
-   [virt/inspector.py](/virt/inspector.py) in this repository
-
-2. Replace file `$PYTHON_SITE_PKG/ceilometer/compute/virt/libvirt/inspector.py` with that at location
-   [virt/libvirt/inspector.py](/virt/libvirt/inspector.py) in this repository
-
-3. Replace file `$PYTHON_SITE_PKG/ceilometer/compute/pollsters/memory.py` with that at location
-   [compute_pollster/memory.py](/compute_pollster/memory.py) in this repository
-
-4. Replace file `$PYTHON_SITE_PKG/ceilometer/compute/pollsters/disk.py` with that at location
-   [compute_pollster/disk.py](/compute_pollster/disk.py) in this repository
-
-5. Edit entry points file and ensure these entries are found at their respective sections:
-
-   ```
-   [ceilometer.notification]
-   memory = ceilometer.compute.notifications.instance:Memory
-   ```
-   ```
-   [ceilometer.poll.compute]
-   memory.usage = ceilometer.compute.pollsters.memory:MemoryUsagePollster
-   disk.capacity = ceilometer.compute.pollsters.disk:CapacityPollster
-   disk.usage = ceilometer.compute.pollsters.disk:PhysicalPollster
    ```
 
 #### Configuration files
