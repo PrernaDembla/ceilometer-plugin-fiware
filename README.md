@@ -46,6 +46,8 @@ The installation and configuration procedure involves both *Central agent pollst
 *Compute agent pollsters* at every compute node. This repository contains all the pollsters and files that IOs would
 need to customize the default Ceilometer installation.
 
+For the pollster installation, specific Ansible recipes are available together with related instructions in this [guide][pollster_deploy].
+
 ### Controller(s)
 
 #### Pollster for region
@@ -485,6 +487,9 @@ https://github.com/SmartInfrastructures/FIWARELab-monitoringAPI
 [fiware_monitoring_architecture_pict]:
 /img/FIWARE_Monitoring_Arch.png
 "FIWARE Monitoring Architecture"
+
+[pollster_deploy]:
+pollster_deploy
 
 ## License
 Apache License, Version 2.0, January 2004
