@@ -286,6 +286,7 @@ installed in all the controllers:
    * The address or domain name of Monasca API
    * Valid Keystone credentials, usually those of the Ceilometer service (which should have previously been assigned
      the *monasca_user* role)
+   * The frequency period in seconds (default is 10 minutes)
 
    ```
    (monasca)# monasca-setup \
@@ -295,6 +296,7 @@ installed in all the controllers:
      --keystone_url=http://cloud.lab.fiware.org:4731/v3 \
      --monasca_url=http://MONASCA_IP:8070/v2.0 \
      --dimensions=region:YOUR_REGION
+	 --check_frequency=600
    ```
 
 5. Only the file `process.yaml` used by [Process Checks plugin][monasca_agent_plugin_process_checks] is required at
