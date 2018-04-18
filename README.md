@@ -129,7 +129,7 @@ Please follow these steps:
    class should be available:
 
    ```
-   # python -c 'from ceilometer.compute.pollsters import host; print host.HostPollster().__class__'
+   # python -c 'from ceilometer.compute.pollsters import host; print host.HostPollster'
    <class 'ceilometer.compute.pollsters.host.HostPollster'>
    ```
 
