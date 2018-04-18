@@ -84,7 +84,7 @@ Please follow these steps:
    `$PYTHON_SITE_PKG/ceilometer`). After that, `RegionPollster` class should be available:
 
    ```
-   # python -c 'from ceilometer.region import region; print region.RegionPollster().__class__'
+   # python -c 'from ceilometer.region import region; print region.RegionPollster'
    <class 'ceilometer.region.region.RegionPollster'>
    ```
 
