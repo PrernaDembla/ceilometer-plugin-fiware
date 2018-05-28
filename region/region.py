@@ -52,22 +52,25 @@ metaD = {
 }
 
 
-class _Base(plugin_base.PollsterBase):
+class RegionPollster(plugin_base.PollsterBase):
 
     @property
     def default_discovery(self):
-        return 'endpoint:%s' % cfg.CONF.service_types.nova
-
-
-class RegionPollster(_Base):
+        LOG.debug("region_pollster:default_discovery")
+        return 'endpoint'
+    
     def get_samples(self, manager, cache, resources):
-        username=cfg.CONF.service_credentials.username
-        password=cfg.CONF.service_credentials.password
-        project_name=cfg.CONF.service_credentials.project_name
-        auth_url=cfg.CONF.service_credentials.auth_url
-        region_name=cfg.CONF.service_credentials.region_name
-        project_domain_id=cfg.CONF.service_credentials.project_domain_id
-        user_domain_id=cfg.CONF.service_credentials.user_domain_id
+        LOG.debug("region_pollster:get_samples")
+        LOG.debug('conf: %s' % cfg.CONF.region.location)
+#        LOG.debug('manager: %s' % dir(manager.keystone))
+#        LOG.debug('resources: %s' % dir(resources))
+        username='ceilometer' #cfg.CONF.service_credentials.username
+        password='4095bf094d1b887f84e09d665' #cfg.CONF.service_credentials.password
+        project_name='service' #cfg.CONF.service_credentials.project_name
+        auth_url='http://172.29.236.100:35357/v3' #cfg.CONF.service_credentials.auth_url
+        region_name='RegionOne' #cfg.CONF.service_credentials.region_name
+        project_domain_id='default' #cfg.CONF.service_credentials.project_domain_id
+        user_domain_id='default' #cfg.CONF.service_credentials.user_domain_id
         auth = identity.Password(auth_url=auth_url,
                          username=username,
                          password=password,
@@ -75,7 +78,8 @@ class RegionPollster(_Base):
                          project_domain_id=project_domain_id,
                          user_domain_id=user_domain_id)
         sess = session.Session(auth=auth)
-        neutron = clientN.Client(session=sess)
+        neutron = clientN.Client(session=sess,insecure=True)
+        LOG.debug('neutron_client: %s' % neutron)
 
         # initialize some variables:
         pool_size = 0
