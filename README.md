@@ -205,7 +205,6 @@ send samples to Monasca:
    directory into `/etc/ceilometer`:
 
    ```
-   pipeline.yaml
    monasca_field_definitions.yaml
    ```
 
