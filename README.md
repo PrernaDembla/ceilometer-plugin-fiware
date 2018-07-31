@@ -11,7 +11,7 @@
 
 ## Description
 
-This repository is organised using branches that are mapped to specific OpenStack releases. Please switch to the proper branch depending on the OpenStack version you are referring to.
+This repository is organised using branches that are mapped to specific OpenStack releases. Please switch to the proper branch depending on the OpenStack version you are referring to. Master branch points to the latest support release.
 
 The following figure describes the high level architecture of the monitoring system.
 
