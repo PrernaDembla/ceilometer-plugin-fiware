@@ -4,19 +4,20 @@
 
 * [Description](#description)
 * [Installation](#installation)
-	* [Controller(s)](#controllers)
-	* [Compute nodes](#compute-nodes)
+	* [Pollster](#pollster)
 	* [Monasca](#monasca)
 * [Verification](#verification)
 * [License](#license)
 
 ## Description
 
+This repository is organised using branches that are mapped to specific OpenStack releases. Please switch to the proper branch depending on the OpenStack version you are referring to.
+
 The following figure describes the high level architecture of the monitoring system.
 
 ![FIWARE Monitoring Architecture][fiware_monitoring_architecture_pict]
 
-Data is collected through [Ceilometer][ceilometer] (where customized pollsters have been developed) from each node.
+Data is collected through [Ceilometer][ceilometer] (where customized plugin has been developed).
 Relevant metrics are sent to [Monasca][monasca] on master node using [Monasca-Ceilometer][monasca_ceilometer] plugin.
 Additionally, the external [Sanity Check][fihealth_sanity_checks] tool from FIHealth publishes the sanity status of the
 nodes directly to Monasca.
@@ -28,7 +29,8 @@ be able to track the following resources of their Openstack environments:
 - __region__
 - __hosts__
 - __images__
-- __host services__ _(OpenStack services: nova, glance, cinder, ... )_
+- __services__ _(OpenStack services: nova, glance, cinder, ... )_
+- __services version__
 - __instances__ (i.e. VMs)
 
 Some additional information about Ceilometer: _it is a tool created in order to handle the [Telemetry][telemetry]
@@ -41,128 +43,27 @@ _Figure taken from [Ceilometer documentation][ceilometer_architecture_doc]_
 
 ## Installation
 
-The installation and configuration procedure involves both *Central agent pollsters* at the controller nodes and
-*Compute agent pollsters* at every compute node. This repository contains all the pollsters and files that IOs would
-need to customize the default Ceilometer installation.
+FIWARE ceilometer plugin is composed by two main component that must be installed and configured on the remote region: *the pollster*: responsible to collect data from Ceilometer and *the monasca*: responsible to send collected data to the monasca master. Therefore also the installation and configuration procedure involves specific instructions on both sides.
+Starting from the OpenStack Pike release and due to the huge changes in the Ceilometer architecture, the pollsters have been unified into a single one that can be installed easily using `pip`. A dedicated repository available at [ceilometer-fiware][ceilometer_fiware] contains the pollster code and related files that IOs would need to customize the default Ceilometer installation.
 
-For the pollster installation, specific Ansible recipes are available together with related instructions in this [guide][pollster_deploy].
+The installation steps of the components interacting with Monasca master and their configuration files are detailed in the related [section][#monasca] of this repository.
 
-### Controller(s)
+### Pollster
 
-#### Pollster for region
+#### Detailed documentation and configuration files
 
-Please follow these steps:
+Pollster configuration files are available [here][ceilometer_fiware] under the `etc/ceilometer` folder.
 
-1. Open the file `/etc/ceilometer/ceilometer.conf` and add these entries (_with your region values_) at the end:
+Copy (or merge) them with the ones on your controller, usually in the ceilometer configuration directory under `/etc/ceilometer`.
 
-   ```
-   [region]
-   latitude=1.1
-   longitude=12.2
-   location=IT
-   netlist=net04_ext,net05_ext
-   ram_allocation_ratio=1.5
-   cpu_allocation_ratio=16
-   ```
-
-   Pay attention to the `netlist` attribute: the names of external networks in your OpenStack installation.
-
-2. Locate the installation directory of Ceilometer package (usually, `pip` command shows such information):
-
-   ```
-   # pip show ceilometer
-   ---
-   Name: ceilometer
-   Version: 2015.1.1
-   Location: /usr/lib/python2.7/dist-packages
-   ```
-
-   In this documentation we will refer to such location as `$PYTHON_SITE_PKG`.
-
-3. Copy [region](/region) directory structure from this repository into Ceilometer package location (by default, at
-   `$PYTHON_SITE_PKG/ceilometer`). After that, `RegionPollster` class should be available:
-
-   ```
-   # python -c 'from ceilometer.region import region; print region.RegionPollster'
-   <class 'ceilometer.region.region.RegionPollster'>
-   ```
-
-4. Locate the entry points file for Ceilometer (which depends on the version: for 2015.1.1, should be located at
-   path `$PYTHON_SITE_PKG/ceilometer-2015.1.1.egg-info/entry_points.txt`) and please add the new pollster at the
-   `[ceilometer.poll.central]` section:
-
-   ```
-   region = ceilometer.region.region:RegionPollster
-   ```
-
-5. Restart Ceilometer Central Agent:
-
-   If using Fuel HA:
-   ```
-   # crm resource restart p_ceilometer-agent-central
-   ```
-   Otherwise:
-   ```
-   # service ceilometer-agent-central restart
-   ```
+Documentation explaining how each metric is measured/collected is available [here][ceilometer_fiware] under the `etc/ceilometer` folder.
 
 
-### Compute nodes
+Please adapt the configuration files to your specific needs. For example check the polling frequency defined by `interval` parameter at `/etc/ceilometer/pipeline.yaml`. Its default value is 60 seconds: you may consider lowering the polling rate.
 
-#### Pollster for hosts
+#### Installation
 
-1. Add these entries to the file `/etc/nova/nova.conf` at section `[DEFAULT]` and restart the __nova-compute__ service:
-
-   ```
-   compute_monitors = ComputeDriverCPUMonitor
-   # The below line is suggested for > Kilo but the above will work, too:
-   # - https://greencircle.vmturbo.com/docs/DOC-4125-enabling-cpu-metrics-in-openstack
-   # - https://docs.openstack.org/newton/config-reference/compute/config-options.html
-   # - https://docs.openstack.org/mitaka/config-reference/compute/config-options.html
-   # compute_monitors = nova.compute.monitors.cpu.virt_driver
-   notification_driver = messagingv2
-   ```
-
-2. Copy [host.py](/compute_pollster/host.py) file from the [compute_pollster](/compute_pollster) directory of this
-   repository into the `compute/pollsters/` subdirectory at Ceilometer package location. After that, `HostPollster`
-   class should be available:
-
-   ```
-   # python -c 'from ceilometer.compute.pollsters import host; print host.HostPollster'
-   <class 'ceilometer.compute.pollsters.host.HostPollster'>
-   ```
-
-3. Edit entry points file to add the new pollster at the `[ceilometer.poll.compute]` section:
-
-   ```
-   compute.info = ceilometer.compute.pollsters.host:HostPollster
-   ```
-
-4. Please check the polling frequency defined by `interval` parameter at `/etc/ceilometer/pipeline.yaml`. Its default
-   value is 60 seconds: you may consider lowering the polling rate.
-
-5. Restart both Nova Compute and Ceilometer Compute Agent:
-
-   ```
-   # service nova-compute restart
-   # service ceilometer-agent-compute restart
-   ```
-
-#### Configuration files
-
-1. Copy (or merge) the following configuration files from [config/compute](/config/compute/etc/ceilometer)
-   directory into `/etc/ceilometer`:
-
-   ```
-   pipeline.yaml
-   ```
-
-2. Restart Compute Agent.
-
-   ```
-   # service ceilometer-agent-compute restart
-   ```
-
+Please follow specific pollster installation instructions available [here][ceilometer_fiware]
 
 ### Monasca
 
@@ -488,8 +389,9 @@ https://github.com/SmartInfrastructures/FIWARELab-monitoringAPI
 /img/FIWARE_Monitoring_Arch.png
 "FIWARE Monitoring Architecture"
 
-[pollster_deploy]:
-pollster_deploy
+[ceilometer_fiware]:
+https://github.com/SmartInfrastructures/ceilometer-fiware
+"FIWARE Lab monitoring system Ceilometer Plugin"
 
 ## License
 Apache License, Version 2.0, January 2004
