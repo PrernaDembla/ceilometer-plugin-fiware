@@ -92,7 +92,7 @@ send samples to Monasca:
 
 3. Edit the entry points file to add the following entries:
 
-   At `[ceilometer.publisher]` section:
+   At `[ceilometer.sample.publisher]` section:
    ```
    monasca = ceilometer.publisher.monclient:MonascaPublisher
    ```
